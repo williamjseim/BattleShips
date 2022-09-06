@@ -3,45 +3,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-enum Ships
+enum Ships : int
 {
-    hangarship,
-    battleship,
-    destroyer,
-    uboat,
-    scoutboat
+    uboat = 1,
+    scoutboat = 2,
+    destroyer = 3,
+    battleship = 4,
+    hangarship = 5,
 }
 namespace BattleShips
 {
     internal class Grid
     {
-        private bool occupied;
+        protected internal Square[,] playerGrid = new Square[10,10];
+        protected internal Square[,] enemyGrid = new Square[10,10];
+        private bool rotated = false;
+        Ships choosen;
 
-        public bool Occupied
+        protected internal void ChooseShip(int i)
         {
-            get { return occupied; }
-            set { occupied = value; }
+            choosen = (Ships)i;
         }
 
-        private Ships occupiedWith;
-
-        public Ships OccupiedWith
+        protected internal void PlaceShip(int left,int top)
         {
-            get { return occupiedWith; }
-            set { occupiedWith = value; }
+            Console.SetCursorPosition(left, top);
+            if(!rotated)
+            {
+                for (int j = 0; j < (int)(choosen)+1; j++)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("#");
+                }
+            }
+            else if (rotated)
+            {
+                for (int j = 0; j < (int)(choosen) + 1; j++)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("#");
+                    Console.SetCursorPosition(left, top++);
+                }
+            }
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
-
-
-        private bool hit;
-
-        public bool Hit
+        protected internal void RotateShip()
         {
-            get { return hit; }
-            set { hit = value; }
+            rotated = !rotated;
         }
-
-
 
     }
 }
