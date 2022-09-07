@@ -18,8 +18,9 @@ namespace BattleShips
         protected internal Square[,] playerGrid = new Square[10,10];
         protected internal Square[,] enemyGrid = new Square[10,10];
         private bool rotated = false;
+        public bool Rotated { get => rotated; }
         Ships choosen;
-
+        public Ships Choosen { get => choosen; }
         protected internal void ChooseShip(int i)
         {
             choosen = (Ships)i;
@@ -38,7 +39,7 @@ namespace BattleShips
             }
             else if (rotated)
             {
-                for (int j = 0; j < (int)(choosen) + 1; j++)
+                for (int j = 0; j < (int)(choosen)+2; j++)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("#");
@@ -53,5 +54,16 @@ namespace BattleShips
             rotated = !rotated;
         }
 
+        public Grid()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    playerGrid[i, j] = new Square();
+                    enemyGrid[i, j] = new Square();
+                }
+            }
+        }
     }
 }

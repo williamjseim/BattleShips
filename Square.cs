@@ -7,7 +7,7 @@ namespace BattleShips
 {
     internal class Square
     {
-        private bool occupied;
+        private bool occupied = false;
 
         public bool Occupied
         {
@@ -29,6 +29,11 @@ namespace BattleShips
         {
             get { return hit; }
             set { hit = value; }
+        }
+
+        public Square()
+        {
+            this.occupied = false;
         }
     }
 }

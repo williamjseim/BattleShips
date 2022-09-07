@@ -5,13 +5,14 @@
         bool placingShip = false;
         bool choosingShip = true;
         Grid grid = new Grid();
+        string[] ships = { "Scoutboat", "Uboat", "Destroyer", "BattleShip", "HangarShip", };
         static void Main(string[] args)
         {
             Program program = new Program();
             Console.SetBufferSize(150, 150);
             program.PrintGrids();
             program.ChooseShip();
-            program.CursorMover();
+            program.PlacingShip();
         }
         void PrintGrids()
         {
@@ -20,14 +21,22 @@
             {
                 for (int j = 0; j < grid.playerGrid.GetLength(1); j++)
                 {
-                    Console.Write("#");
+                    if (grid.playerGrid[i, j].Occupied)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write("#");
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write("#");
+                    }
                 }
                 Console.Write("\n");
             }
         }
         void ChooseShip()
         {
-            string[] ships = { "Scoutboat", "Uboat", "Destroyer", "BattleShip", "HangarShip",   };
             Console.SetCursorPosition(12, 0);
             foreach (string item in ships)
             {
@@ -61,12 +70,13 @@
                         grid.PlaceShip(Console.CursorLeft, Console.CursorTop);
                         Console.SetCursorPosition(0, 0);
                         placingShip = true;
-                        CursorMover();
+                        PlacingShip();
+                        ships[i] = "";
                         break;
                 }
             }
         }
-        void CursorMover()
+        void PlacingShip()
         {
             int down = 0;
             int left = 0;
@@ -107,9 +117,39 @@
                         PrintGrids();
                         grid.PlaceShip(left,down);
                         break;
+                    case ConsoleKey.Enter:
+                        placingShip = false;
+                        PlaceShip(down,left);
+                        break;
                 }
                 Console.SetCursorPosition(left, down);
             }
+        }
+
+        void PlaceShip(int left,int top)
+        {
+            Console.SetCursorPosition(left,top);
+            if (grid.Rotated)
+            {
+                for (int i = 0; i < (int)grid.Choosen + 1; i++)
+                {
+                    grid.playerGrid[left++,top].Occupied = true;
+                }
+            }
+            else if (!grid.Rotated)
+            {
+                for (int i = 0; i < (int)grid.Choosen+1; i++)
+                {
+                    grid.playerGrid[left, top++].Occupied = true;
+                }
+            }
+            else
+            {
+                Console.WriteLine("shouldnt be here (placeship)");
+            }
+            PrintGrids();
+            choosingShip = true;
+            ChooseShip();
         }
     }
 }
