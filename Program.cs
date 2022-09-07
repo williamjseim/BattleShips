@@ -12,6 +12,7 @@
             Console.SetBufferSize(150, 150);
             program.PrintGrids();
             program.ChooseShip();
+            program.PlacingShip();
         }
         void PrintGrids()
         {
@@ -33,15 +34,17 @@
                 }
                 Console.Write("\n");
             }
+            Console.SetCursorPosition(12, 0);
+            foreach (string item in ships)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(item);
+                Console.CursorLeft = 12;
+            }
         }
         void ChooseShip()
         {
             Console.SetCursorPosition(12, 0);
-            foreach (string item in ships)
-            {
-                Console.WriteLine(item);
-                Console.CursorLeft = 12;
-            }
             int i = 0;
             Console.SetCursorPosition(ships[i].Length + 12, i);
             while (choosingShip)
@@ -70,40 +73,54 @@
                         Console.SetCursorPosition(0, 0);
                         placingShip = true;
                         PlacingShip();
-                        ships[i] = "";
                         break;
                 }
             }
         }
+
         void PlacingShip()
         {
-            int down = 0;
+            int top = 0;
             int left = 0;
             while (placingShip)
             {
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.UpArrow:
-                        if(down > 0)
-                        down--;
+                        if(top > 0)
+                        top--;
                         PrintGrids();
-                        grid.PlaceShip(left ,down);
+                        grid.PlaceShip(left ,top);
                         break;
                     case ConsoleKey.DownArrow:
-                        down++;
+                        if(top < 10 - (1 + ((int)grid.Choosen)) && grid.Rotated)
+                        {
+                            top++;
+                        }
+                        else if (top < 9&&!grid.Rotated)
+                        {
+                            top++;
+                        }
                         PrintGrids();
-                        grid.PlaceShip(left, down);
+                        grid.PlaceShip(left, top);
                         break;
                     case ConsoleKey.LeftArrow:
                         if(left > 0)
                         left--;
                         PrintGrids();
-                        grid.PlaceShip(left, down);
+                        grid.PlaceShip(left, top);
                         break;
                     case ConsoleKey.RightArrow:
-                        left++;
+                        if(left < 10 - (1 + ((int)grid.Choosen)) && !grid.Rotated)
+                        {
+                            left++;
+                        }
+                        else if (left < 9&&grid.Rotated)
+                        {
+                            left++;
+                        }
                         PrintGrids();
-                        grid.PlaceShip(left, down);
+                        grid.PlaceShip(left, top);
                         break;
                     case ConsoleKey.Backspace:
                         placingShip=false;
@@ -112,43 +129,94 @@
                         ChooseShip();
                         break;
                     case ConsoleKey.R:
+                        if(grid.Rotated&&left > ((int)grid.Choosen))
+                        {
+                            left = 10 - (1 + ((int)grid.Choosen));
+                        }
+                        else if (!grid.Rotated && top > ((int)grid.Choosen))
+                        {
+                            top = 10 - (1+((int)grid.Choosen));
+                        }
                         grid.RotateShip();
                         PrintGrids();
-                        grid.PlaceShip(left,down);
+                        grid.PlaceShip(left,top);
                         break;
                     case ConsoleKey.Enter:
                         placingShip = false;
-                        PlaceShip(down,left);
+                        PlaceShip(top,left);
                         break;
                 }
-                Console.SetCursorPosition(left, down);
+                Console.SetCursorPosition(left, top);
             }
         }
 
         void PlaceShip(int left,int top)
         {
+            for (int i = 0; i < grid.playerGrid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.playerGrid.GetLength(1); j++)
+                {
+                    if (grid.playerGrid[i,j].OccupiedWith == grid.Choosen)
+                    {
+                        grid.playerGrid[i,j].Occupied = false;
+                    }
+                }
+            }
             Console.SetCursorPosition(left,top);
-            if (grid.Rotated)
+            if (grid.Rotated && (int)grid.Choosen + left < 10 && top < 10&& CheckForShips(left,top))
             {
                 for (int i = 0; i < (int)grid.Choosen + 1; i++)
                 {
+                    grid.playerGrid[left,top].OccupiedWith = grid.Choosen;
                     grid.playerGrid[left++,top].Occupied = true;
                 }
             }
-            else if (!grid.Rotated)
+            else if (!grid.Rotated&&left < 10&& (int)grid.Choosen + top < 10&& CheckForShips(left, top))
             {
                 for (int i = 0; i < (int)grid.Choosen+1; i++)
                 {
+                    grid.playerGrid[left, top].OccupiedWith = grid.Choosen;
                     grid.playerGrid[left, top++].Occupied = true;
                 }
             }
             else
             {
+                Console.SetCursorPosition(5, 15);
+                Console.WriteLine("Error");
                 Console.WriteLine("shouldnt be here (placeship)");
+                Thread.Sleep(1000);
+                Console.SetCursorPosition(5, 15);
+                Console.WriteLine("          ");
+                Console.WriteLine("                              ");
             }
             PrintGrids();
             choosingShip = true;
             ChooseShip();
+        }
+
+        bool CheckForShips(int left,int top)
+        {
+            if (!grid.Rotated)
+            {
+                for (int i = 0; i < ((int)grid.Choosen)+1; i++)
+                {
+                    if(grid.playerGrid[left, top++].Occupied)
+                    {
+                        return false;
+                    }
+                }
+            }
+            else if (grid.Rotated)
+            {
+                for (int i = 0; i < ((int)grid.Choosen) + 1; i++)
+                {
+                    if (grid.playerGrid[left++, top].Occupied)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }
