@@ -12,7 +12,6 @@
             Console.SetBufferSize(150, 150);
             program.PrintGrids();
             program.ChooseShip();
-            program.PlacingShip();
         }
         void PrintGrids()
         {
